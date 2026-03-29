@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class SpellProjectileJS extends AbstractMagicProjectile implements IProjectileEntityJS, AntiMagicSusceptible {
     public static record OnAntiMagicContext(MagicData getMagicData, Entity getEntity){}
@@ -95,9 +96,9 @@ public class SpellProjectileJS extends AbstractMagicProjectile implements IProje
     }
 
     @Override
-    public Optional<SoundEvent> getImpactSound() {
+    public Optional<Supplier<SoundEvent>> getImpactSound() {
         if (builder.setImpactSound != null) {
-            return Optional.ofNullable(ForgeRegistries.SOUND_EVENTS.getValue((ResourceLocation) builder.setImpactSound));
+            return Optional.ofNullable((Supplier<SoundEvent>) ForgeRegistries.SOUND_EVENTS.getValue((ResourceLocation) builder.setImpactSound));
         }
         return Optional.empty();
     }

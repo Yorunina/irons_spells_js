@@ -5,6 +5,7 @@
   "refmap": "${mod_id}.refmap.json",
   "mixins": [
     "AbstractSpellMixin",
+    "AdditionalWanderingTradesMixin",
     "ClientInitEventJSMixin",
     "FormatterRegistryMixin",
     "IronsSpellbooksMixin",

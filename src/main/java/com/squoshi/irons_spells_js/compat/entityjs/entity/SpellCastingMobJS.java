@@ -214,14 +214,14 @@ public class SpellCastingMobJS extends PathfinderMob implements IAnimatableJS, I
 
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
-        this.playerMagicData.getSyncedData().saveNBTData(pCompound);
+        this.playerMagicData.getSyncedData().saveNBTData(pCompound, null);
         pCompound.putBoolean("usedSpecial", this.hasUsedSingleAttack);
     }
 
     public void readAdditionalSaveData(CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         SyncedSpellData syncedSpellData = new SyncedSpellData(this);
-        syncedSpellData.loadNBTData(pCompound);
+        syncedSpellData.loadNBTData(pCompound, null);
         if (syncedSpellData.isCasting()) {
             AbstractSpell spell = SpellRegistry.getSpell(syncedSpellData.getCastingSpellId());
             this.initiateCastSpell(spell, syncedSpellData.getCastingSpellLevel());

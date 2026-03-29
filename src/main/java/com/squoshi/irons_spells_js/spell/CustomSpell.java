@@ -10,26 +10,34 @@ import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.*;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
+import io.redspace.ironsspellbooks.capabilities.magic.RecastInstance;
+import io.redspace.ironsspellbooks.capabilities.magic.RecastResult;
+import io.redspace.ironsspellbooks.capabilities.magic.SummonManager;
+import io.redspace.ironsspellbooks.capabilities.magic.SummonedEntitiesCastData;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.function.*;
 
 public class CustomSpell extends AbstractSpell {
-    record CastContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, CastSource getCastSource, MagicData getPlayerMagicData){}
+    record CastContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, CastSource getCastSource, MagicData getPlayerMagicData, AbstractSpell getSpell){}
     record CastClientContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, ICastData getCastData){}
 
     record PreCastContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, MagicData getPlayerMagicData){}
     record PreCastClientContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, InteractionHand getHand, MagicData getPlayerMagicData){}
     record PreCastConditionsContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, MagicData getPlayerMagicData, AbstractSpell getSpell){}
+    record RecastFinishedContext(ServerPlayer getServerPlayer, RecastInstance getRecastInstance, RecastResult getRecastResult, ICastDataSerializable getCastDataSerializable, AbstractSpell getSpell){}
 
     private final ResourceLocation spellResource;
     private final DefaultConfig defaultConfig;
@@ -40,12 +48,14 @@ public class CustomSpell extends AbstractSpell {
     private final Consumer<PreCastContext> onPreCast;
     private final Consumer<PreCastClientContext> onPreClientCast;
     private final boolean allowLooting;
-    private final boolean needsLearning;
     private final Predicate<Player> canBeCrafted;
-    private final BiFunction<Integer,LivingEntity,List<MutableComponent>> uniqueInfo;
+    private final ICastDataSerializable emptyCastData;
+    private final BiFunction<Integer, LivingEntity, List<MutableComponent>> uniqueInfo;
     private final AnimationHolder castStartAnimation;
     private final AnimationHolder castFinishAnimation;
     private final Predicate<PreCastConditionsContext> preCastConditions;
+    private final BiFunction<Integer, LivingEntity, Double> getRecastCount;
+    private final Consumer<RecastFinishedContext> onRecastFinished;
 
     public CustomSpell(Builder b) {
         this.spellResource = b.spellResource;
@@ -68,12 +78,14 @@ public class CustomSpell extends AbstractSpell {
         this.castTime = b.castTime;
         this.baseManaCost = b.baseManaCost;
         this.allowLooting = b.allowLooting;
-        this.needsLearning = b.needsLearning;
+        this.emptyCastData = b.emptyCastData;
         this.canBeCrafted = b.canBeCrafted;
         this.uniqueInfo = b.uniqueInfo;
         this.castStartAnimation = b.castStartAnimation;
         this.castFinishAnimation = b.castFinishAnimation;
         this.preCastConditions = b.preCastConditions;
+        this.getRecastCount = b.getRecastCount;
+        this.onRecastFinished = b.onRecastFinished;
     }
 
     @Override
@@ -102,9 +114,19 @@ public class CustomSpell extends AbstractSpell {
     }
 
     @Override
+    public void onRecastFinished(ServerPlayer serverPlayer, RecastInstance recastInstance, RecastResult recastResult, ICastDataSerializable castDataSerializable) {
+        if (onRecastFinished != null) {
+            var context = new RecastFinishedContext(serverPlayer, recastInstance, recastResult, castDataSerializable, this);
+            ISSKJSUtils.safeCallback(onRecastFinished, context, "Error while calling onRecastFinished");
+            return;
+        }
+        super.onRecastFinished(serverPlayer, recastInstance, recastResult, castDataSerializable);
+    }
+
+    @Override
     public void onCast(Level level, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         if (onCast != null) {
-            var context = new CastContext(level, spellLevel, entity, castSource, playerMagicData);
+            var context = new CastContext(level, spellLevel, entity, castSource, playerMagicData, this);
             ISSKJSUtils.safeCallback(onCast, context,"Error while calling onCast");
         }
         super.onCast(level, spellLevel, entity, castSource, playerMagicData);
@@ -143,9 +165,10 @@ public class CustomSpell extends AbstractSpell {
     }
 
     @Override
-    public boolean needsLearning() {
-        return needsLearning;
+    public ICastDataSerializable getEmptyCastData() {
+        return this.emptyCastData;
     }
+
 
     @Override
     public boolean canBeCraftedBy(Player player) {
@@ -186,6 +209,14 @@ public class CustomSpell extends AbstractSpell {
         return super.checkPreCastConditions(level, spellLevel, entity, playerMagicData);
     }
 
+    @Override
+    public int getRecastCount(int spellLevel, @Nullable LivingEntity entity) {
+        if (getRecastCount != null) {
+            return getRecastCount.apply(spellLevel, entity).intValue();
+        }
+        return super.getRecastCount(spellLevel, entity);
+    }
+
     @SuppressWarnings("unused")
     public static class Builder extends BuilderBase<CustomSpell> {
         private SpellRarity minRarity = SpellRarity.COMMON;
@@ -206,12 +237,14 @@ public class CustomSpell extends AbstractSpell {
         private int castTime = 0;
         private int baseManaCost = 40;
         private boolean allowLooting = false;
-        private boolean needsLearning = false;
+        private ICastDataSerializable emptyCastData = null;
         private Predicate<Player> canBeCrafted = null;
         private BiFunction<Integer,LivingEntity,List<MutableComponent>> uniqueInfo;
         private AnimationHolder castStartAnimation = null;
         private AnimationHolder castFinishAnimation = null;
         private Predicate<PreCastConditionsContext> preCastConditions = null;
+        private BiFunction<Integer, LivingEntity, Double> getRecastCount = null;
+        private Consumer<RecastFinishedContext> onRecastFinished = null;
 
         public Builder(ResourceLocation i) {
             super(i);
@@ -233,6 +266,32 @@ public class CustomSpell extends AbstractSpell {
             this.startSound = soundEvent;
             return this;
         }
+
+        @Info(value = """
+            Sets the recast count of the spell. The recast count is the amount of time it takes for the spell to be cast again.
+        """)
+        public Builder setRecastCount(BiFunction<Integer, LivingEntity, Double> getRecastCount) {
+            this.getRecastCount = getRecastCount;
+            return this;
+        }
+
+        @Info(value = """
+            Sets the recast count of the spell. The recast count is the amount of time it takes for the spell to be cast again.
+        """)
+        public Builder onRecastFinished(Consumer<RecastFinishedContext> onRecastFinished) {
+            this.onRecastFinished = onRecastFinished;
+            return this;
+        }
+
+        @Info(value = """
+            Sets the empty cast data of the spell. The empty cast data is the data that is used to store the summoned entities.
+        """)
+        public Builder setEmptyCastData(ICastDataSerializable emptyCastData) {
+            this.emptyCastData = emptyCastData;
+            return this;
+        }
+
+
 
         @Info(value = """
             Sets the sound that the spell will play after it is done casting.
@@ -357,13 +416,6 @@ public class CustomSpell extends AbstractSpell {
             return this;
         }
 
-        @Info(value = """
-            Sets whether or not the spell needs to be learned before it can be casted.
-        """)
-        public Builder needsLearning(boolean needs) {
-            this.needsLearning = needs;
-            return this;
-        }
 
         @Info(value = """
             Sets the predicate for whether or not the spell can be crafted by a player.

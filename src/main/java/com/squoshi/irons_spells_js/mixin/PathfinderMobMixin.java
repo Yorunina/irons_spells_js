@@ -157,7 +157,7 @@ public class PathfinderMobMixin extends Mob implements IMagicEntity {
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         if (!(self() instanceof AbstractSpellCastingMob)){
-            playerMagicData.getSyncedData().saveNBTData(pCompound);
+            playerMagicData.getSyncedData().saveNBTData(pCompound, null);
             pCompound.putBoolean("usedSpecial", this.hasUsedSingleAttack);
         }
     }
@@ -167,7 +167,7 @@ public class PathfinderMobMixin extends Mob implements IMagicEntity {
         super.readAdditionalSaveData(pCompound);
         if (!(self() instanceof AbstractSpellCastingMob)){
             SyncedSpellData syncedSpellData = new SyncedSpellData(self());
-            syncedSpellData.loadNBTData(pCompound);
+            syncedSpellData.loadNBTData(pCompound, null);
             if (syncedSpellData.isCasting()) {
                 AbstractSpell spell = SpellRegistry.getSpell(syncedSpellData.getCastingSpellId());
                 this.initiateCastSpell(spell, syncedSpellData.getCastingSpellLevel());

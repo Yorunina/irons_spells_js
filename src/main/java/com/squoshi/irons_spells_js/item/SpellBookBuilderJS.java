@@ -84,7 +84,7 @@ public class SpellBookBuilderJS extends BuilderBase<SpellBook> {
         if (!map.isEmpty()) {
             return new SimpleAttributeSpellBook(maxSpellSlots, SpellRarity.LEGENDARY, map);
         }
-        return new SpellBook(maxSpellSlots, SpellRarity.LEGENDARY);
+        return new SpellBook(maxSpellSlots);
     }
 
     public record AttributeHolder(ResourceLocation attribute, AttributeModifier modifier) {

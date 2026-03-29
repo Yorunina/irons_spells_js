@@ -23,7 +23,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.jetbrains.annotations.NotNull;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -98,7 +98,7 @@ public class SpellProjectileJS extends AbstractMagicProjectile implements IProje
     @Override
     public Optional<Supplier<SoundEvent>> getImpactSound() {
         if (builder.setImpactSound != null) {
-            return Optional.ofNullable((Supplier<SoundEvent>) ForgeRegistries.SOUND_EVENTS.getValue((ResourceLocation) builder.setImpactSound));
+            return Optional.of(() -> ForgeRegistries.SOUND_EVENTS.getValue((ResourceLocation) builder.setImpactSound));
         }
         return Optional.empty();
     }

@@ -5,6 +5,7 @@ import com.squoshi.irons_spells_js.util.ISSKJSUtils;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.kubejs.registry.RegistryInfo;
 import dev.latvian.mods.kubejs.typings.Info;
+import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -50,6 +51,7 @@ public class CustomSpell extends AbstractSpell {
     private final boolean allowLooting;
     private final Predicate<Player> canBeCrafted;
     private final ICastDataSerializable emptyCastData;
+    private final boolean needsLearning;
     private final BiFunction<Integer, LivingEntity, List<MutableComponent>> uniqueInfo;
     private final AnimationHolder castStartAnimation;
     private final AnimationHolder castFinishAnimation;
@@ -78,6 +80,7 @@ public class CustomSpell extends AbstractSpell {
         this.castTime = b.castTime;
         this.baseManaCost = b.baseManaCost;
         this.allowLooting = b.allowLooting;
+        this.needsLearning = b.needsLearning;
         this.emptyCastData = b.emptyCastData;
         this.canBeCrafted = b.canBeCrafted;
         this.uniqueInfo = b.uniqueInfo;
@@ -165,10 +168,13 @@ public class CustomSpell extends AbstractSpell {
     }
 
     @Override
+    public boolean requiresLearning() {
+        return needsLearning;
+    }
+
     public ICastDataSerializable getEmptyCastData() {
         return this.emptyCastData;
     }
-
 
     @Override
     public boolean canBeCraftedBy(Player player) {
@@ -239,6 +245,7 @@ public class CustomSpell extends AbstractSpell {
         private boolean allowLooting = false;
         private ICastDataSerializable emptyCastData = null;
         private Predicate<Player> canBeCrafted = null;
+        private boolean needsLearning = false;
         private BiFunction<Integer,LivingEntity,List<MutableComponent>> uniqueInfo;
         private AnimationHolder castStartAnimation = null;
         private AnimationHolder castFinishAnimation = null;
@@ -416,6 +423,13 @@ public class CustomSpell extends AbstractSpell {
             return this;
         }
 
+        @Info(value = """
+            Sets whether or not the spell needs to be learned before it can be casted.
+        """)
+        public Builder needsLearning(boolean needs) {
+            this.needsLearning = needs;
+            return this;
+        }
 
         @Info(value = """
             Sets the predicate for whether or not the spell can be crafted by a player.
@@ -437,7 +451,8 @@ public class CustomSpell extends AbstractSpell {
             Sets the cast start animation for the spell.
         """)
         public Builder setCastStartAnimation(String path, boolean playOnce, boolean animatesLegs) {
-            this.castStartAnimation = new AnimationHolder(path, playOnce, animatesLegs);
+            var rl = path.contains(":") ? ResourceLocation.tryParse(path) : IronsSpellbooks.id(path);
+            this.castStartAnimation = new AnimationHolder(rl, playOnce, animatesLegs);
             return this;
         }
 
@@ -445,7 +460,8 @@ public class CustomSpell extends AbstractSpell {
             Sets the cast finish animation for the spell.
         """)
         public Builder setCastFinishAnimation(String path, boolean playOnce, boolean animatesLegs) {
-            this.castFinishAnimation = new AnimationHolder(path, playOnce, animatesLegs);
+            var rl = path.contains(":") ? ResourceLocation.tryParse(path) : IronsSpellbooks.id(path);
+            this.castFinishAnimation = new AnimationHolder(rl, playOnce, animatesLegs);
             return this;
         }
 

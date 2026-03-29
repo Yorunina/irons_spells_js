@@ -10,6 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 @SuppressWarnings("unused")
 public interface ServerPlayerISSKJS {
+
     @HideFromJS
     ServerPlayer irons_spells_js$getServerPlayer();
 

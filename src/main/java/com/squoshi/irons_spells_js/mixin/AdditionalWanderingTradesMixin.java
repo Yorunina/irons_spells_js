@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AdditionalWanderingTrades.class)
 public class AdditionalWanderingTradesMixin {
-    @Inject(method = "addWanderingTrades", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "addWanderingTrades", at = @At(value = "HEAD"), cancellable = true, remap = false)
     private static void addWanderingTrades(CallbackInfo ci){
         ci.cancel();
     }

@@ -5,8 +5,8 @@ import com.squoshi.irons_spells_js.events.IronsSpellsJSEvents;
 import com.squoshi.irons_spells_js.item.CustomMagicSwordItem;
 import com.squoshi.irons_spells_js.item.CustomSpellBook;
 import com.squoshi.irons_spells_js.item.CustomStaff;
-import com.squoshi.irons_spells_js.spell.CustomSpell;
 import com.squoshi.irons_spells_js.spell.AbstractSpellWrapper;
+import com.squoshi.irons_spells_js.spell.CustomSpell;
 import com.squoshi.irons_spells_js.spell.school.SchoolTypeJSBuilder;
 import com.squoshi.irons_spells_js.util.AlchemistCauldronRecipeSchemas;
 import com.squoshi.irons_spells_js.util.ISSKJSUtils;
@@ -54,9 +54,9 @@ public class IronsSpellsJSPlugin extends KubeJSPlugin {
 
     @Override
     public void registerRecipeSchemas(RegisterRecipeSchemasEvent event) {
-        event.register(ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "alchemist_cauldron_brew"), AlchemistCauldronRecipeSchemas.BREW);
-        event.register(ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "alchemist_cauldron_fill"), AlchemistCauldronRecipeSchemas.FILL);
-        event.register(ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "alchemist_cauldron_empty"), AlchemistCauldronRecipeSchemas.EMPTY);
+        event.register(new ResourceLocation("irons_spellbooks", "alchemist_cauldron_brew"), AlchemistCauldronRecipeSchemas.BREW);
+        event.register(new ResourceLocation("irons_spellbooks", "alchemist_cauldron_fill"), AlchemistCauldronRecipeSchemas.FILL);
+        event.register(new ResourceLocation("irons_spellbooks", "alchemist_cauldron_empty"), AlchemistCauldronRecipeSchemas.EMPTY);
     }
     @Override
     public void registerBindings(BindingsEvent event) {

@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 public class SpellProjectileJS extends AbstractMagicProjectile implements IProjectileEntityJS, AntiMagicSusceptible {
-    public static record OnAntiMagicContext(MagicData getMagicData, Entity getEntity){}
+    public record OnAntiMagicContext(MagicData getMagicData, Entity getEntity){}
 
     public SpellProjectileJSBuilder builder;
 

@@ -46,7 +46,7 @@ public class SchoolTypeJSBuilder extends BuilderBase<SchoolType> {
     """)
     public final SchoolTypeJSBuilder addFocusItemTags(String... focusTags) {
         for (var tag : focusTags) {
-            var id = tag.contains(":") ? ResourceLocation.parse(tag) :  ResourceLocation.fromNamespaceAndPath("minecraft", tag);
+            var id = tag.contains(":") ? new ResourceLocation(tag) :  new ResourceLocation("minecraft", tag);
             var tagKey = ItemTags.create(id);
             this.focusTags.add(tagKey);
         }
@@ -68,7 +68,7 @@ public class SchoolTypeJSBuilder extends BuilderBase<SchoolType> {
         Default tag is `${mod_id}:${school_name}_focus`
     """)
     public SchoolTypeJSBuilder setDefaultFocusTag(String tag) {
-        var id = tag.contains(":") ? ResourceLocation.parse(tag) :  ResourceLocation.fromNamespaceAndPath("minecraft", tag);
+        var id = tag.contains(":") ? new ResourceLocation(tag) : new ResourceLocation("minecraft", tag);
         this.schoolFocus = ItemTags.create(id);
         return this;
     }

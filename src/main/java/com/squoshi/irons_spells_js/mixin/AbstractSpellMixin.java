@@ -33,7 +33,7 @@ import static com.squoshi.irons_spells_js.events.SpellModificationEventJS.getOrC
 
 @Mixin(AbstractSpell.class)
 public abstract class AbstractSpellMixin implements ISpellModify {
-    @Shadow public abstract String getSpellName();
+    @Shadow(remap = false) public abstract String getSpellName();
 
     @Unique
     private SpellModificationBuilder irons_spells_js$builder;

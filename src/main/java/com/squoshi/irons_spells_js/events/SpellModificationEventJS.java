@@ -1,10 +1,8 @@
 package com.squoshi.irons_spells_js.events;
 
-import com.squoshi.irons_spells_js.IronsSpellsJSMod;
 import com.squoshi.irons_spells_js.spell.SpellModificationBuilder;
 import dev.latvian.mods.kubejs.event.EventJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
-import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraft.resources.ResourceLocation;
 
@@ -19,8 +17,6 @@ public class SpellModificationEventJS extends EventJS {
     private final ResourceLocation spell;
 
     public SpellModificationEventJS(ResourceLocation spellResource) {
-        IronsSpellsJSMod.LOGGER.info(spellResource);
-        IronsSpellsJSMod.LOGGER.info(SpellRegistry.getSpell(spellResource));
         this.spell = spellResource;
         this.builder = new SpellModificationBuilder(spellResource);
         if (!eventMap.containsKey(spellResource)) {

@@ -13,11 +13,13 @@ import io.redspace.ironsspellbooks.api.spells.*;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
 import io.redspace.ironsspellbooks.capabilities.magic.RecastInstance;
 import io.redspace.ironsspellbooks.capabilities.magic.RecastResult;
+import io.redspace.ironsspellbooks.damage.SpellDamageSource;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 public class CustomSpell extends AbstractSpell {
@@ -38,6 +41,9 @@ public class CustomSpell extends AbstractSpell {
     record PreCastClientContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, InteractionHand getHand, MagicData getPlayerMagicData){}
     record PreCastConditionsContext(Level getLevel, int getSpellLevel, LivingEntity getEntity, MagicData getPlayerMagicData, AbstractSpell getSpell){}
     record RecastFinishedContext(ServerPlayer getServerPlayer, RecastInstance getRecastInstance, RecastResult getRecastResult, ICastDataSerializable getCastDataSerializable, AbstractSpell getSpell){}
+    record DamageSourceContext(Entity getProjectile, Entity getAttacker, AbstractSpell getSpell){}
+    record EffectiveCastTimeContext(int getSpellLevel, LivingEntity getEntity, AbstractSpell getSpell){}
+
 
     private final ResourceLocation spellResource;
     private final DefaultConfig defaultConfig;
@@ -57,6 +63,8 @@ public class CustomSpell extends AbstractSpell {
     private final Predicate<PreCastConditionsContext> preCastConditions;
     private final BiFunction<Integer, LivingEntity, Double> getRecastCount;
     private final Consumer<RecastFinishedContext> onRecastFinished;
+    private final Function<DamageSourceContext, SpellDamageSource> damageSource;
+    private final Function<EffectiveCastTimeContext, Double> effectiveCastTime;
 
     public CustomSpell(Builder b) {
         this.spellResource = b.spellResource;
@@ -88,6 +96,8 @@ public class CustomSpell extends AbstractSpell {
         this.preCastConditions = b.preCastConditions;
         this.getRecastCount = b.getRecastCount;
         this.onRecastFinished = b.onRecastFinished;
+        this.damageSource = b.damageSource;
+        this.effectiveCastTime = b.effectiveCastTime;
     }
 
     @Override
@@ -222,6 +232,23 @@ public class CustomSpell extends AbstractSpell {
         return super.getRecastCount(spellLevel, entity);
     }
 
+    @Override
+    public SpellDamageSource getDamageSource(@Nullable Entity projectile, Entity attacker) {
+        if (this.damageSource != null) {
+            return this.damageSource.apply(new DamageSourceContext(projectile, attacker, this));
+        }
+        return super.getDamageSource(projectile, attacker);
+    }
+
+    @Override
+    public int getEffectiveCastTime(int spellLevel, @Nullable LivingEntity entity) {
+        if (this.effectiveCastTime != null) {
+            return this.effectiveCastTime.apply(new EffectiveCastTimeContext(spellLevel, entity, this)).intValue();
+        }
+        return super.getEffectiveCastTime(spellLevel, entity);
+    }
+
+
     @SuppressWarnings("unused")
     public static class Builder extends BuilderBase<CustomSpell> {
         private SpellRarity minRarity = SpellRarity.COMMON;
@@ -251,6 +278,8 @@ public class CustomSpell extends AbstractSpell {
         private Predicate<PreCastConditionsContext> preCastConditions = null;
         private BiFunction<Integer, LivingEntity, Double> getRecastCount = null;
         private Consumer<RecastFinishedContext> onRecastFinished = null;
+        private Function<DamageSourceContext, SpellDamageSource>  damageSource = null;
+        private Function<EffectiveCastTimeContext, Double> effectiveCastTime = null;
 
         public Builder(ResourceLocation i) {
             super(i);
@@ -486,6 +515,17 @@ public class CustomSpell extends AbstractSpell {
         @Override
         public CustomSpell createObject() {
             return new CustomSpell(this);
+        }
+
+
+        public Builder getDamageSource(Function<DamageSourceContext, SpellDamageSource> damageSource) {
+            this.damageSource = damageSource;
+            return this;
+        }
+
+        public Builder getEffectiveCastTime(Function<EffectiveCastTimeContext, Double> effectiveCastTime) {
+            this.effectiveCastTime = effectiveCastTime;
+            return this;
         }
     }
 }

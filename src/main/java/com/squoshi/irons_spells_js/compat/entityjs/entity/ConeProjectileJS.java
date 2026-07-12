@@ -9,8 +9,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ConeProjectileJS extends AbstractConeProjectile implements IProjectileEntityJS {
     public ConeProjectileJSBuilder builder;
+    public Map<String, Object> customData = new HashMap<>();
 
     public ConeProjectileJS(ConeProjectileJSBuilder builder, EntityType<? extends AbstractConeProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);

@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class AoeEntityJSBuilder extends ProjectileEntityBuilder<AoeEntityJS> {
-    public record applyEffectContext(LivingEntity getTarget, AoeEntity getEntity){}
+    public record applyEffectContext(LivingEntity getTarget, AoeEntityJS getEntity){}
     public transient Consumer<applyEffectContext> applyEffect;
     public transient Function<AoeEntity, ParticleOptions> getParticle;
     public transient Function<AoeEntity, Double> getParticleCount;

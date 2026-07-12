@@ -10,7 +10,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import java.util.function.Consumer;
 
 public class ConeProjectileJSBuilder extends ProjectileEntityBuilder<ConeProjectileJS> {
-    public record onHitEntityContext(EntityHitResult getEntityHitResult, AbstractConeProjectile getEntity){}
+    public record onHitEntityContext(EntityHitResult getEntityHitResult, ConeProjectileJS getEntity){}
     public transient Consumer<AbstractConeProjectile> spawnParticles;
     public transient Consumer<onHitEntityContext> onConeHitEntity;
     public ConeProjectileJSBuilder(ResourceLocation i) {

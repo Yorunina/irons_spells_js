@@ -65,6 +65,7 @@ public class CustomSpell extends AbstractSpell {
     private final Consumer<RecastFinishedContext> onRecastFinished;
     private final Function<DamageSourceContext, SpellDamageSource> damageSource;
     private final Function<EffectiveCastTimeContext, Double> effectiveCastTime;
+    private final boolean stopSoundOnCancel;
 
     public CustomSpell(Builder b) {
         this.spellResource = b.spellResource;
@@ -98,6 +99,7 @@ public class CustomSpell extends AbstractSpell {
         this.onRecastFinished = b.onRecastFinished;
         this.damageSource = b.damageSource;
         this.effectiveCastTime = b.effectiveCastTime;
+        this.stopSoundOnCancel = b.stopSoundOnCancel;
     }
 
     @Override
@@ -248,6 +250,11 @@ public class CustomSpell extends AbstractSpell {
         return super.getEffectiveCastTime(spellLevel, entity);
     }
 
+    @Override
+    public boolean stopSoundOnCancel() {
+        return stopSoundOnCancel;
+    }
+
 
     @SuppressWarnings("unused")
     public static class Builder extends BuilderBase<CustomSpell> {
@@ -280,6 +287,7 @@ public class CustomSpell extends AbstractSpell {
         private Consumer<RecastFinishedContext> onRecastFinished = null;
         private Function<DamageSourceContext, SpellDamageSource>  damageSource = null;
         private Function<EffectiveCastTimeContext, Double> effectiveCastTime = null;
+        private boolean stopSoundOnCancel = false;
 
         public Builder(ResourceLocation i) {
             super(i);
@@ -525,6 +533,14 @@ public class CustomSpell extends AbstractSpell {
 
         public Builder getEffectiveCastTime(Function<EffectiveCastTimeContext, Double> effectiveCastTime) {
             this.effectiveCastTime = effectiveCastTime;
+            return this;
+        }
+
+        @Info(value = """
+            Sets whether the casting sound should stop when the spell is cancelled.
+        """)
+        public Builder setStopSoundOnCancel(boolean stopSoundOnCancel) {
+            this.stopSoundOnCancel = stopSoundOnCancel;
             return this;
         }
     }

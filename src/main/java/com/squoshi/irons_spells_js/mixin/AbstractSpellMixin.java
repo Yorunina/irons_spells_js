@@ -93,6 +93,13 @@ public abstract class AbstractSpellMixin implements ISpellModify {
         }
     }
 
+    @Inject(method = "stopSoundOnCancel", at = @At("HEAD"), remap = false, cancellable = true)
+    private void irons_spells_js$stopSoundOnCancel(CallbackInfoReturnable<Boolean> cir) {
+        if (irons_spells_js$getBuilder() != null && irons_spells_js$getBuilder().stopSoundOnCancel.isPresent()) {
+            cir.setReturnValue(irons_spells_js$getBuilder().stopSoundOnCancel.get());
+        }
+    }
+
     @Inject(method = "onClientCast", at = @At("HEAD"), remap = false, cancellable = true)
     private void irons_spells_js$onClientCast(Level level, int spellLevel, LivingEntity entity, ICastData castData, CallbackInfo ci) {
         if (irons_spells_js$getBuilder() == null || irons_spells_js$getBuilder().setClientCastCallback == null) return;

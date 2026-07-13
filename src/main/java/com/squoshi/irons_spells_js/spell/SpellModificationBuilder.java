@@ -53,7 +53,7 @@ public class SpellModificationBuilder extends EventJS {
     public transient boolean cancelServerPreCast = false;
     public transient Predicate<Player> isLearnedCallback;
     public transient BiFunction<Integer, LivingEntity, List<MutableComponent>> customUniqueInfo;
-    public transient Optional<Boolean> stopSoundOnCancel = Optional.empty();
+    public transient boolean stopSoundOnCancel = false;
 
     public SpellModificationBuilder(ResourceLocation spellResource) {
         this.spellResource = spellResource;
@@ -125,7 +125,7 @@ public class SpellModificationBuilder extends EventJS {
     }
 
     public SpellModificationBuilder setStopSoundOnCancel(boolean stopSoundOnCancel) {
-        this.stopSoundOnCancel = Optional.of(stopSoundOnCancel);
+        this.stopSoundOnCancel = stopSoundOnCancel;
         return this;
     }
 

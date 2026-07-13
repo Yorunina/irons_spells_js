@@ -6,6 +6,7 @@
   "mixins": [
     "AbstractSpellMixin",
     "AdditionalWanderingTradesMixin",
+    "BlackHoleMixin",
     "ClientInitEventJSMixin",
     "FormatterRegistryMixin",
     "IronsSpellbooksMixin",

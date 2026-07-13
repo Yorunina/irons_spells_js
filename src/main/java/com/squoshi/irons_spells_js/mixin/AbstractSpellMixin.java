@@ -95,8 +95,8 @@ public abstract class AbstractSpellMixin implements ISpellModify {
 
     @Inject(method = "stopSoundOnCancel", at = @At("HEAD"), remap = false, cancellable = true)
     private void irons_spells_js$stopSoundOnCancel(CallbackInfoReturnable<Boolean> cir) {
-        if (irons_spells_js$getBuilder() != null && irons_spells_js$getBuilder().stopSoundOnCancel.isPresent()) {
-            cir.setReturnValue(irons_spells_js$getBuilder().stopSoundOnCancel.get());
+        if (irons_spells_js$getBuilder() != null) {
+            cir.setReturnValue(irons_spells_js$getBuilder().stopSoundOnCancel);
         }
     }
 

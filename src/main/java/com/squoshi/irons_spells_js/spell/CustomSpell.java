@@ -66,6 +66,7 @@ public class CustomSpell extends AbstractSpell {
     private final Function<DamageSourceContext, SpellDamageSource> damageSource;
     private final Function<EffectiveCastTimeContext, Double> effectiveCastTime;
     private final boolean stopSoundOnCancel;
+    private final Predicate<Player> canBeInterrupted;
 
     public CustomSpell(Builder b) {
         this.spellResource = b.spellResource;
@@ -100,6 +101,7 @@ public class CustomSpell extends AbstractSpell {
         this.damageSource = b.damageSource;
         this.effectiveCastTime = b.effectiveCastTime;
         this.stopSoundOnCancel = b.stopSoundOnCancel;
+        this.canBeInterrupted = b.canBeInterrupted;
     }
 
     @Override
@@ -255,6 +257,14 @@ public class CustomSpell extends AbstractSpell {
         return stopSoundOnCancel;
     }
 
+    @Override
+    public boolean canBeInterrupted(@Nullable Player player) {
+        if (this.canBeInterrupted != null) {
+            return this.canBeInterrupted.test(player);
+        }
+        return super.canBeInterrupted(player);
+    }
+
 
     @SuppressWarnings("unused")
     public static class Builder extends BuilderBase<CustomSpell> {
@@ -288,6 +298,7 @@ public class CustomSpell extends AbstractSpell {
         private Function<DamageSourceContext, SpellDamageSource>  damageSource = null;
         private Function<EffectiveCastTimeContext, Double> effectiveCastTime = null;
         private boolean stopSoundOnCancel = false;
+        private Predicate<Player> canBeInterrupted = null;
 
         public Builder(ResourceLocation i) {
             super(i);
@@ -541,6 +552,11 @@ public class CustomSpell extends AbstractSpell {
         """)
         public Builder setStopSoundOnCancel(boolean stopSoundOnCancel) {
             this.stopSoundOnCancel = stopSoundOnCancel;
+            return this;
+        }
+
+        public Builder setCanBeInterrupted(Predicate<Player> predicate) {
+            this.canBeInterrupted = predicate;
             return this;
         }
     }

@@ -21,11 +21,10 @@ import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.*;
 import io.redspace.ironsspellbooks.api.util.AnimationHolder;
+import io.redspace.ironsspellbooks.api.util.CameraShakeData;
+import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
 import io.redspace.ironsspellbooks.api.util.Utils;
-import io.redspace.ironsspellbooks.capabilities.magic.RecastInstance;
-import io.redspace.ironsspellbooks.capabilities.magic.SummonManager;
-import io.redspace.ironsspellbooks.capabilities.magic.SummonedEntitiesCastData;
-import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
+import io.redspace.ironsspellbooks.capabilities.magic.*;
 import io.redspace.ironsspellbooks.entity.mobs.goals.*;
 import io.redspace.ironsspellbooks.registries.PotionRegistry;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
@@ -85,6 +84,9 @@ public class IronsSpellsJSPlugin extends KubeJSPlugin {
         event.add("RecastInstance", RecastInstance.class);
         event.add("SummonedEntitiesCastData", SummonedEntitiesCastData.class);
         event.add("MagicHelper", MagicHelper.class);
+        event.add("MagicManager", MagicManager.class);
+        event.add("CameraShakeManager", CameraShakeManager.class);
+        event.add("CameraShakeData", CameraShakeData.class);
     }
 
     @Override

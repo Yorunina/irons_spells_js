@@ -25,8 +25,11 @@ import io.redspace.ironsspellbooks.api.util.CameraShakeData;
 import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.*;
+import io.redspace.ironsspellbooks.damage.DamageSources;
 import io.redspace.ironsspellbooks.entity.mobs.goals.*;
+import io.redspace.ironsspellbooks.registries.ParticleRegistry;
 import io.redspace.ironsspellbooks.registries.PotionRegistry;
+import io.redspace.ironsspellbooks.setup.PacketDistributor;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -87,6 +90,9 @@ public class IronsSpellsJSPlugin extends KubeJSPlugin {
         event.add("MagicManager", MagicManager.class);
         event.add("CameraShakeManager", CameraShakeManager.class);
         event.add("CameraShakeData", CameraShakeData.class);
+        event.add("PacketDistributor", PacketDistributor.class);
+        event.add("ParticleRegistry", ParticleRegistry.class);
+        event.add("ISSDamageSources", DamageSources.class);
     }
 
     @Override

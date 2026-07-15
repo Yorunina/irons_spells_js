@@ -82,6 +82,7 @@ import java.util.*;
 @ParametersAreNonnullByDefault
 @SuppressWarnings("unused")
 public class SpellCastingMobJS extends PathfinderMob implements IAnimatableJS, IMagicEntity {
+
     private static final EntityDataAccessor<Boolean> DATA_CANCEL_CAST;
     private static final EntityDataAccessor<Boolean> DATA_DRINKING_POTION;
     private final MagicData playerMagicData = new MagicData(true);

@@ -9,6 +9,7 @@
     "BlackHoleMixin",
     "ClientInitEventJSMixin",
     "FormatterRegistryMixin",
+    "IceTombEntityMixin",
     "IronsSpellbooksMixin",
     "MagicManagerMixin",
     "ManaBarOverlayMixin",

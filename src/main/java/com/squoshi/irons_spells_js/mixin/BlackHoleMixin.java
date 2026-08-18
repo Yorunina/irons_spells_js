@@ -5,6 +5,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import io.redspace.ironsspellbooks.entity.spells.black_hole.BlackHole;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -52,6 +53,7 @@ public abstract class BlackHoleMixin extends Projectile {
     private boolean applyPercentageDamage(Entity target, float baseAmount, DamageSource damageSource, Operation<Boolean> original) {
         if (this.percentageDamage && target instanceof LivingEntity livingEntity && livingEntity.isAlive()) {
             baseAmount = baseAmount * livingEntity.getMaxHealth();
+            return target.hurt(target.damageSources().magic(), baseAmount);
         }
         return original.call(target, baseAmount, damageSource);
     }
@@ -72,5 +74,19 @@ public abstract class BlackHoleMixin extends Projectile {
             return owner == null || this.leftOwner || !owner.isPassengerOfSameVehicle(entity);
         }
         return original.call(instance, entity);
+    }
+
+    @Inject(method = "addAdditionalSaveData", at = @At("HEAD"))
+    private void saveData(CompoundTag pCompound, CallbackInfo ci) {
+        pCompound.putBoolean("KillOnEnd", this.killOnEnd);
+        pCompound.putBoolean("PercentageDamage", this.percentageDamage);
+        pCompound.putBoolean("IgnoreProjectileProtection", this.ignoreProjectileProtection);
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("HEAD"))
+    private void readData(CompoundTag pCompound, CallbackInfo ci) {
+        this.killOnEnd = pCompound.getBoolean("KillOnEnd");
+        this.percentageDamage = pCompound.getBoolean("PercentageDamage");
+        this.ignoreProjectileProtection = pCompound.getBoolean("IgnoreProjectileProtection");
     }
 }

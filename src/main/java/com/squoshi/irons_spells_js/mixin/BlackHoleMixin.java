@@ -3,7 +3,6 @@ package com.squoshi.irons_spells_js.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import io.redspace.ironsspellbooks.entity.spells.black_hole.BlackHole;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.damagesource.DamageSource;
@@ -59,15 +58,18 @@ public abstract class BlackHoleMixin extends Projectile {
     }
 
 
-    @Inject(method = "handleClientEffects", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;setDeltaMovement(Lnet/minecraft/world/phys/Vec3;)V"), remap = false)
-    private void maa$killEntitiesOnEnd(Vec3 center, CallbackInfo ci, @Local(name = "entity") Entity entity) {
-        if (!this.killOnEnd) {
-            return;
+    @Inject(method = "handleClientEffects", at = @At(value = "INVOKE", target = "Lio/redspace/ironsspellbooks/entity/spells/black_hole/BlackHole;discard()V"))
+    private void ironsSpellsJs$killEntitiesOnEnd(Vec3 center, CallbackInfo ci) {
+        if (!this.killOnEnd) return;
+
+        for (Entity entity : this.level().getEntities(this, this.getBoundingBox().inflate(1.0D))) {
+            if (entity.distanceToSqr(center) < (double)9.0F && entity instanceof LivingEntity living && living.isAlive() && !entity.isSpectator()) {
+                entity.kill();
+            }
         }
-        entity.kill();
     }
 
-    @WrapOperation(method = "handleGravity", at = @At(value = "INVOKE", target = "Lio/redspace/ironsspellbooks/entity/spells/black_hole/BlackHole;canHitEntity(Lnet/minecraft/world/entity/Entity;)Z"), remap = false)
+    @WrapOperation(method = "handleGravity", at = @At(value = "INVOKE", target = "Lio/redspace/ironsspellbooks/entity/spells/black_hole/BlackHole;canHitEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     private boolean canHitEntity(BlackHole instance, Entity entity, Operation<Boolean> original) {
         if (this.ignoreProjectileProtection) {
             Entity owner = this.getOwner();
